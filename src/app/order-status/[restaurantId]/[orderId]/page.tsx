@@ -3,13 +3,22 @@
 import React from "react"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { CheckCircle, ChefHat, Utensils, CreditCard, MapPin, Loader2, AlertCircle } from "lucide-react"
+import { CheckCircle, ChefHat, Utensils, CreditCard, MapPin, Loader2, AlertCircle, Bell } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { subscribeToOrder, getRestaurant } from "@/lib/firebase/db"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { subscribeToOrder, getRestaurant, createTableCall } from "@/lib/firebase/db"
 import type { Order, OrderItem, Restaurant } from "@/lib/firebase/db"
 
 type OrderWithItems = Order & { id: string; items: (OrderItem & { id: string })[] }
@@ -63,6 +72,10 @@ export default function OrderStatusPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showCallDialog, setShowCallDialog] = useState(false)
+  const [callReason, setCallReason] = useState<'waiter' | 'bill' | 'other'>('waiter')
+  const [callMessage, setCallMessage] = useState('')
+  const [callingWaiter, setCallingWaiter] = useState(false)
 
   // Actualizar tiempo cada segundo
   useEffect(() => {
@@ -299,15 +312,116 @@ export default function OrderStatusPage() {
               Cancelar Pedido
             </Button>
           )}
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => window.location.href = `/menu/${restaurantId}?table=${order.tableNumber}`}
-          >
-            Hacer Otro Pedido
-          </Button>
+          {order.status !== 'paid' && order.status !== 'cancelled' && (
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => setShowCallDialog(true)}
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Llamar al Mesero
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Call Waiter Dialog */}
+      <Dialog open={showCallDialog} onOpenChange={setShowCallDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Llamar al Mesero</DialogTitle>
+            <DialogDescription>
+              Selecciona el motivo por el cual necesitas al mesero
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Button
+                variant={callReason === 'waiter' ? 'default' : 'outline'}
+                className="w-full justify-start"
+                onClick={() => setCallReason('waiter')}
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                Necesito atención del mesero
+              </Button>
+              <Button
+                variant={callReason === 'bill' ? 'default' : 'outline'}
+                className="w-full justify-start"
+                onClick={() => setCallReason('bill')}
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Solicitar la cuenta
+              </Button>
+              <Button
+                variant={callReason === 'other' ? 'default' : 'outline'}
+                className="w-full justify-start"
+                onClick={() => setCallReason('other')}
+              >
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Otro motivo
+              </Button>
+            </div>
+            
+            {callReason === 'other' && (
+              <Textarea
+                placeholder="Describe brevemente lo que necesitas..."
+                value={callMessage}
+                onChange={(e) => setCallMessage(e.target.value)}
+                className="min-h-[100px]"
+              />
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowCallDialog(false)
+              setCallMessage('')
+            }}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={async () => {
+                if (!order) return
+                
+                setCallingWaiter(true)
+                try {
+                  const callData: any = {
+                    tableNumber: order.tableNumber,
+                    orderId: order.id,
+                    orderNumber: order.orderNumber,
+                    reason: callReason
+                  }
+                  
+                  // Only add message for 'other' reason and if not empty
+                  if (callReason === 'other' && callMessage.trim()) {
+                    callData.message = callMessage.trim()
+                  }
+                  
+                  await createTableCall(restaurantId, callData)
+                  setShowCallDialog(false)
+                  setCallMessage('')
+                  // Show success message
+                  alert('El mesero ha sido notificado y vendrá pronto.')
+                } catch (error) {
+                  console.error('Error calling waiter:', error)
+                  alert('Error al llamar al mesero. Por favor intenta de nuevo.')
+                } finally {
+                  setCallingWaiter(false)
+                }
+              }}
+              disabled={callingWaiter || (callReason === 'other' && !callMessage.trim())}
+            >
+              {callingWaiter ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Llamando...
+                </>
+              ) : (
+                'Confirmar Llamada'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

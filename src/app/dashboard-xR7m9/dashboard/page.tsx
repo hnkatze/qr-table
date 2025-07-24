@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Overview } from "@/components/Overview"
 import { RecentSales } from "@/components/RecentSales"
 import { TablesOverview } from "@/components/TablesOverview"
+import { TableCalls } from "@/components/TableCalls"
 import { DashboardHeader } from "@/components/DashboardHeader"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/contexts/AuthContext"
@@ -365,9 +366,10 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Tables Overview */}
-        <div className="mt-4">
+        {/* Tables Overview and Calls */}
+        <div className="grid gap-4 mt-4 lg:grid-cols-2">
           <TablesOverview restaurantId={user.restaurantId} />
+          <TableCalls restaurantId={user.restaurantId} />
         </div>
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">

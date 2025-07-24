@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CreditCard, DollarSign, Check, Loader2, Clock, Receipt, X } from "lucide-react"
+import { CreditCard, DollarSign, Check, Loader2, Clock, Receipt, X, ShoppingBag } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +21,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SettingsMenu } from "@/components/SettingsMenu"
 import { DashboardHeader } from "@/components/DashboardHeader"
+import { TablesOverview } from "@/components/TablesOverview"
 import { useAuth } from "@/contexts/AuthContext"
 import { subscribeToOrders, updateOrderStatus } from "@/lib/firebase/db"
 import type { Order, OrderItem } from "@/lib/firebase/db"
@@ -201,8 +202,11 @@ export default function CashierPanel() {
           </Card>
         </div>
 
+        {/* Tables Overview */}
+        <TablesOverview restaurantId={user?.restaurantId || ''} />
+
         {/* Tabs for orders */}
-        <Tabs defaultValue="active" className="space-y-4">
+        <Tabs defaultValue="active" className="space-y-4 mt-4">
           <TabsList>
             <TabsTrigger value="active">Órdenes Activas ({activeOrders.length})</TabsTrigger>
             <TabsTrigger value="paid">Cobradas ({todayOrders.length})</TabsTrigger>
@@ -238,13 +242,46 @@ export default function CashierPanel() {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-2 mb-4">
-                            {order.items.map((item) => (
-                              <div key={item.id} className="flex justify-between text-sm">
-                                <span>{item.quantity}x {item.productName}</span>
-                                <span>L. {item.subtotal}</span>
-                              </div>
-                            ))}
+                          <div className="text-sm text-gray-600 mb-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <span>Productos: {order.items.length}</span>
+                              <span>Items totales: {order.items.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                            </div>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="w-full">
+                                  <ShoppingBag className="h-4 w-4 mr-2" />
+                                  Ver Productos
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-[95vw] sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle className="text-base sm:text-lg">{order.orderNumber} - Mesa {order.tableNumber}</DialogTitle>
+                                  <DialogDescription className="text-sm">
+                                    Detalle de productos del pedido
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-2 sm:space-y-3 max-h-[60vh] sm:max-h-[400px] overflow-y-auto">
+                                  {order.items.map((item) => (
+                                    <div key={item.id} className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                      <div className="flex-1 mr-2">
+                                        <div className="font-medium text-sm sm:text-base">{item.productName}</div>
+                                        <div className="text-xs sm:text-sm text-gray-600">
+                                          {item.quantity} x L. {item.productPrice} = L. {item.subtotal}
+                                        </div>
+                                      </div>
+                                      <Badge variant="secondary" className="text-xs sm:text-sm">{item.quantity}</Badge>
+                                    </div>
+                                  ))}
+                                  <div className="border-t pt-2 sm:pt-3 font-bold">
+                                    <div className="flex justify-between text-sm sm:text-base">
+                                      <span>Total:</span>
+                                      <span>L. {order.totalAmount}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
                           </div>
                           
                           <div className="flex gap-2">

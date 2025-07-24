@@ -16,6 +16,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SettingsMenu } from "@/components/SettingsMenu"
 import { DashboardHeader } from "@/components/DashboardHeader"
+import { TablesOverview } from "@/components/TablesOverview"
+import { WaiterNotifications } from "@/components/WaiterNotifications"
 import { useAuth } from "@/contexts/AuthContext"
 import { subscribeToOrders, updateOrderStatus, getAllProducts, getCategories, updateOrder } from "@/lib/firebase/db"
 import type { Order, OrderItem, Product, Category } from "@/lib/firebase/db"
@@ -276,12 +278,16 @@ export default function WaiterPanel() {
               👤 {user?.fullName || 'Mesero'}
             </Badge>
             <Badge variant="secondary">{orders.filter((o) => canEditOrder(o.status)).length} órdenes editables</Badge>
+            {user && <WaiterNotifications restaurantId={user.restaurantId} userId={user.id} />}
           </>
         }
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-6">
+          {/* Tables Overview */}
+          <TablesOverview restaurantId={user?.restaurantId || ''} />
+          
           <Card>
             <CardHeader>
               <CardTitle>Órdenes Asignadas</CardTitle>
@@ -311,51 +317,85 @@ export default function WaiterPanel() {
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-3">
-                          {(editingOrder === order.id ? tempOrders[order.id]?.items || [] : order.items).map((item) => (
-                            <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                              <div className="flex-1">
-                                <span className="font-medium">{item.productName}</span>
-                                <div className="text-sm text-gray-600">L. {item.productPrice} c/u</div>
+                        {editingOrder === order.id ? (
+                          <div className="space-y-3">
+                            {(tempOrders[order.id]?.items || []).map((item) => (
+                              <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex-1">
+                                  <span className="font-medium">{item.productName}</span>
+                                  <div className="text-sm text-gray-600">L. {item.productPrice} c/u</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => updateOrderItem(order.id, item.id, item.quantity - 1)}
+                                    disabled={item.quantity <= 1}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="w-8 text-center font-medium">{item.quantity}</span>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => updateOrderItem(order.id, item.id, item.quantity + 1)}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => updateOrderItem(order.id, item.id, 0)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </div>
-
-                              <div className="flex items-center gap-3">
-                                {canEditOrder(order.status) && editingOrder === order.id ? (
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => updateOrderItem(order.id, item.id, item.quantity - 1)}
-                                      disabled={item.quantity <= 1}
-                                    >
-                                      <Minus className="h-4 w-4" />
-                                    </Button>
-                                    <span className="w-8 text-center font-medium">{item.quantity}</span>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => updateOrderItem(order.id, item.id, item.quantity + 1)}
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={() => updateOrderItem(order.id, item.id, 0)}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <div className="text-right">
-                                    <div className="font-medium">Cantidad: {item.quantity}</div>
-                                    <div className="text-sm text-gray-600">Subtotal: L. {item.subtotal}</div>
-                                  </div>
-                                )}
-                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-600">
+                            <div className="flex items-center justify-between mb-2">
+                              <span>Productos: {order.items.length}</span>
+                              <span>Items totales: {order.items.reduce((sum, item) => sum + item.quantity, 0)}</span>
                             </div>
-                          ))}
-                        </div>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="w-full">
+                                  <ShoppingBag className="h-4 w-4 mr-2" />
+                                  Ver Productos
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-[95vw] sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle className="text-base sm:text-lg">{order.orderNumber} - Mesa {order.tableNumber}</DialogTitle>
+                                  <DialogDescription className="text-sm">
+                                    Detalle de productos del pedido
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-2 sm:space-y-3 max-h-[60vh] sm:max-h-[400px] overflow-y-auto">
+                                  {order.items.map((item) => (
+                                    <div key={item.id} className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                      <div className="flex-1 mr-2">
+                                        <div className="font-medium text-sm sm:text-base">{item.productName}</div>
+                                        <div className="text-xs sm:text-sm text-gray-600">
+                                          {item.quantity} x L. {item.productPrice} = L. {item.subtotal}
+                                        </div>
+                                      </div>
+                                      <Badge variant="secondary" className="text-xs sm:text-sm">{item.quantity}</Badge>
+                                    </div>
+                                  ))}
+                                  <div className="border-t pt-2 sm:pt-3 font-bold">
+                                    <div className="flex justify-between text-sm sm:text-base">
+                                      <span>Total:</span>
+                                      <span>L. {order.totalAmount}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        )}
 
                         <div className="flex gap-2 mt-4 pt-4 border-t">
                           {canEditOrder(order.status) && (

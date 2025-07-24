@@ -50,10 +50,10 @@ export function SettingsMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-1 sm:gap-2">
           <Settings className="h-4 w-4" />
-          Configuración
-          <ChevronDown className="h-4 w-4" />
+          <span className="hidden sm:inline">Configuración</span>
+          <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">

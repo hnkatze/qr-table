@@ -141,3 +141,16 @@
     -webkit-line-clamp: 2;
   }
 }
+
+/* Prevent body scroll when dialog is open */
+body:has([data-state="open"]) {
+  overflow: hidden;
+  padding-right: 0 !important;
+}
+
+/* Ensure dialog portal is properly positioned */
+[data-slot="dialog-portal"] {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}

@@ -109,6 +109,18 @@ export interface Table {
   createdAt: Timestamp
 }
 
+export interface TableCall {
+  tableNumber: string
+  orderId: string
+  orderNumber: string
+  reason: 'waiter' | 'bill' | 'other'
+  status: 'pending' | 'attended'
+  message?: string
+  createdAt: Timestamp
+  attendedAt?: Timestamp
+  attendedBy?: string
+}
+
 // Helper functions
 const getRestaurantRef = (restaurantId: string) => doc(db, 'restaurants', restaurantId)
 
@@ -554,6 +566,65 @@ export const getTablesWithActiveOrders = async (restaurantId: string) => {
   })
   
   return tableOrders
+}
+
+// Table calls operations
+export const createTableCall = async (
+  restaurantId: string,
+  callData: Omit<TableCall, 'createdAt' | 'status'>
+) => {
+  const colRef = collection(db, 'restaurants', restaurantId, 'tableCalls')
+  const dataToSave: any = {
+    tableNumber: callData.tableNumber,
+    orderId: callData.orderId,
+    orderNumber: callData.orderNumber,
+    reason: callData.reason,
+    status: 'pending',
+    createdAt: serverTimestamp()
+  }
+  
+  // Only add message if it's defined and not empty
+  if (callData.message && callData.message.trim()) {
+    dataToSave.message = callData.message
+  }
+  
+  return await addDoc(colRef, dataToSave)
+}
+
+export const getActiveTableCalls = async (restaurantId: string) => {
+  const colRef = collection(db, 'restaurants', restaurantId, 'tableCalls')
+  const q = query(colRef, where('status', '==', 'pending'), orderBy('createdAt', 'desc'))
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TableCall & { id: string }))
+}
+
+export const attendTableCall = async (
+  restaurantId: string,
+  callId: string,
+  userId: string
+) => {
+  const docRef = doc(db, 'restaurants', restaurantId, 'tableCalls', callId)
+  await updateDoc(docRef, {
+    status: 'attended',
+    attendedAt: serverTimestamp(),
+    attendedBy: userId
+  })
+}
+
+export const subscribeToTableCalls = (
+  restaurantId: string,
+  callback: (calls: (TableCall & { id: string })[]) => void
+) => {
+  const colRef = collection(db, 'restaurants', restaurantId, 'tableCalls')
+  const q = query(colRef, where('status', '==', 'pending'), orderBy('createdAt', 'desc'))
+  
+  return onSnapshot(q, (snapshot) => {
+    const calls = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as TableCall & { id: string }))
+    callback(calls)
+  })
 }
 
 // Generate order number

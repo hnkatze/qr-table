@@ -49,29 +49,31 @@ export function DashboardHeader({ title, subtitle, badges }: DashboardHeaderProp
 
   return (
     <header className="bg-white border-b">
-      <div className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-6">
             {restaurant?.logoUrl && (
               <img
                 src={restaurant.logoUrl}
                 alt={restaurant.name}
-                className="h-16 w-16 object-cover rounded-lg"
+                className="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded-lg flex-shrink-0"
               />
             )}
-            <div>
-              <h1 className="text-3xl font-bold">{restaurant?.name || 'Restaurante'}</h1>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold truncate">{restaurant?.name || 'Restaurante'}</h1>
               {restaurant?.slogan && (
-                <p className="text-gray-600 mt-1">{restaurant.slogan}</p>
+                <p className="text-sm sm:text-base text-gray-600 mt-0.5 sm:mt-1 truncate">{restaurant.slogan}</p>
               )}
-              <div className="flex items-center gap-2 mt-2">
-                {title && <span className="text-sm text-gray-500">{title}</span>}
-                {subtitle && <span className="text-sm text-gray-500">• {subtitle}</span>}
+              <div className="flex flex-wrap items-center gap-2 mt-1 sm:mt-2">
+                {title && <span className="text-xs sm:text-sm text-gray-500">{title}</span>}
+                {subtitle && <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">• {subtitle}</span>}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            {badges}
+          <div className="flex items-center gap-2 sm:gap-4 self-end sm:self-auto">
+            <div className="flex flex-wrap items-center gap-2">
+              {badges}
+            </div>
             <SettingsMenu />
           </div>
         </div>

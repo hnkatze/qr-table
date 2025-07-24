@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getTablesWithActiveOrders } from "@/lib/firebase/db"
 import { Clock, Users, DollarSign, Eye } from "lucide-react"
 import type { Order } from "@/lib/firebase/db"
@@ -91,54 +91,35 @@ export function TablesOverview({ restaurantId }: TablesOverviewProps) {
         {activeTables.length === 0 ? (
           <p className="text-center text-gray-500 py-8">No hay mesas con órdenes activas</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {activeTables.map(([tableNumber, order]) => (
-              <Card key={tableNumber} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-lg">Mesa {tableNumber}</h3>
-                      <p className="text-sm text-gray-600">{order.orderNumber}</p>
-                    </div>
-                    <Badge className={getStatusColor(order.status)}>
-                      {getStatusLabel(order.status)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Cliente:</span>
-                    <span className="font-medium">{order.customerName || 'Anónimo'}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Tiempo:
-                    </span>
-                    <span className="font-medium">{getElapsedTime(order.timestamps.receivedAt)} min</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />
-                      Total:
-                    </span>
-                    <span className="font-bold text-orange-600">L. {order.totalAmount}</span>
-                  </div>
-                  
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => window.open(`/order-status/${restaurantId}/${order.id}`, '_blank')}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Ver Orden
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Mesa</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="text-right w-[80px]">Tiempo</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {activeTables
+                  .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }))
+                  .map(([tableNumber, order]) => (
+                  <TableRow key={tableNumber}>
+                    <TableCell className="font-medium">Mesa {tableNumber}</TableCell>
+                    <TableCell>
+                      <Badge className={`${getStatusColor(order.status)}`}>
+                        {getStatusLabel(order.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">L. {order.totalAmount}</TableCell>
+                    <TableCell className="text-right text-sm text-gray-500">
+                      {getElapsedTime(order.timestamps.receivedAt)} min
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </CardContent>
