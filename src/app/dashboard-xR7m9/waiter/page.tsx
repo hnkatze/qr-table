@@ -144,8 +144,7 @@ export default function WaiterPanel() {
           productName: product.name,
           productPrice: product.price,
           quantity: 1,
-          subtotal: product.price,
-          createdAt: Timestamp.now()
+          subtotal: product.price
         }
         updatedItems = [...order.items, newItem]
       }

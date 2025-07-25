@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { getRestaurant, getCategories, getProductsByCategory, createOrder, generateOrderNumber, checkTableHasActiveOrder } from "@/lib/firebase/db"
 import type { Restaurant, Category, Product } from "@/lib/firebase/db"
+import { Timestamp } from 'firebase/firestore'
 
 
 interface CartItem {
@@ -181,7 +182,9 @@ export default function MenuPage() {
         status: 'received' as const,
         totalAmount: getTotalPrice(),
         notes: '',
-        timestamps: {},
+        timestamps: {
+          receivedAt: Timestamp.now()
+        },
         users: {}
       }
       

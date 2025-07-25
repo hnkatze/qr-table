@@ -16,11 +16,14 @@ export function QRScanner({ onScan, onError }: QRScannerProps) {
   const [isScanning, setIsScanning] = useState(false)
   const [lastScan, setLastScan] = useState<string>('')
 
-  const handleScan = (result: string) => {
-    if (result && result !== lastScan) {
-      setLastScan(result)
-      onScan(result)
-      setIsScanning(false)
+  const handleScan = (results: any[]) => {
+    if (results && results.length > 0) {
+      const result = results[0].rawValue
+      if (result && result !== lastScan) {
+        setLastScan(result)
+        onScan(result)
+        setIsScanning(false)
+      }
     }
   }
 
@@ -87,20 +90,28 @@ export function QRScanner({ onScan, onError }: QRScannerProps) {
       <CardContent className="p-0">
         <div className="relative aspect-square max-w-md mx-auto">
           <Scanner
-            onScan={(result) => handleScan(result[0].rawValue)}
+            onScan={handleScan}
             onError={handleError}
             constraints={{
               facingMode: 'environment'
             }}
+            formats={['qr_code']}
             components={{
-              finder: () => (
-                <div className="absolute inset-0 border-2 border-orange-500 rounded-lg m-8">
-                  <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-orange-600 rounded-tl-lg"></div>
-                  <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-orange-600 rounded-tr-lg"></div>
-                  <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-orange-600 rounded-bl-lg"></div>
-                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-orange-600 rounded-br-lg"></div>
-                </div>
-              )
+              onOff: false,
+              torch: false,
+              zoom: false,
+              finder: true,
+            }}
+            styles={{
+              container: {
+                width: '100%',
+                height: '100%'
+              },
+              video: {
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }
             }}
           />
         </div>

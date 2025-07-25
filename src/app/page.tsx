@@ -1,7 +1,8 @@
 "use client"
 import { QrCode, MapPin, Clock, TrendingUp, Mail, MessageCircle, Shield, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 export default function HomePage() {
   return (
@@ -37,9 +38,9 @@ export default function HomePage() {
               </a>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <a href="/menu/restaurant_001?table=demo">
+              <Link href="/menu/restaurant_001?table=demo">
                 Ver Demo
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
@@ -170,9 +171,9 @@ export default function HomePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="/menu/restaurant_001?table=demo" className="hover:text-white transition-colors">
+                  <Link href="/menu/restaurant_001?table=demo" className="hover:text-white transition-colors">
                     Ver Demo
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

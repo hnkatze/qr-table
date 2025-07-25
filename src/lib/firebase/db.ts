@@ -411,7 +411,7 @@ export const updateOrder = async (
         // Existing item, use the same id
         return setDoc(doc(itemsColRef, id), {
           ...itemData,
-          createdAt: itemData.createdAt || serverTimestamp()
+          createdAt: serverTimestamp()
         })
       }
     })

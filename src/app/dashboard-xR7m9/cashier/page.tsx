@@ -452,7 +452,7 @@ export default function CashierPanel() {
                             {order.timestamps.paidAt && 
                               (order.timestamps.paidAt.toDate ? 
                                 order.timestamps.paidAt.toDate() : 
-                                new Date(order.timestamps.paidAt)
+                                new Date(order.timestamps.paidAt as any)
                               ).toLocaleTimeString("es-HN", {
                                 hour: "2-digit",
                                 minute: "2-digit",

@@ -50,7 +50,7 @@ export async function getSession(): Promise<SessionUser | null> {
   
   try {
     const { payload } = await jwtVerify(token.value, getJwtSecretKey())
-    return payload as SessionUser
+    return payload as any as SessionUser
   } catch (error) {
     return null
   }

@@ -4,9 +4,7 @@ export const createUserSchema = z.object({
   username: z.string().min(3, 'El nombre de usuario debe tener al menos 3 caracteres'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
   fullName: z.string().min(1, 'El nombre completo es requerido'),
-  role: z.enum(['admin', 'cashier', 'waiter'], {
-    errorMap: () => ({ message: 'Rol inválido' })
-  }),
+  role: z.enum(['admin', 'cashier', 'waiter'] as const).describe('Rol inválido'),
   isActive: z.boolean().default(true),
 })
 

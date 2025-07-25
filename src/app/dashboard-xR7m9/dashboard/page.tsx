@@ -93,12 +93,12 @@ export default function AdminDashboard() {
         
         // Filter orders by date range
         const filteredOrders = ordersData.filter(order => {
-          const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt)
+          const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt as any)
           return orderDate >= filterDate
         })
         
         filteredOrders.forEach(order => {
-          const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt)
+          const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt as any)
           
           // Only count paid orders for sales
           if (order.status === 'paid') {
@@ -107,8 +107,8 @@ export default function AdminDashboard() {
             
             // Calculate service time (from received to paid)
             if (order.timestamps.receivedAt && order.timestamps.paidAt) {
-              const received = order.timestamps.receivedAt.toDate ? order.timestamps.receivedAt.toDate() : new Date(order.timestamps.receivedAt)
-              const paid = order.timestamps.paidAt.toDate ? order.timestamps.paidAt.toDate() : new Date(order.timestamps.paidAt)
+              const received = order.timestamps.receivedAt.toDate ? order.timestamps.receivedAt.toDate() : new Date(order.timestamps.receivedAt as any)
+              const paid = order.timestamps.paidAt.toDate ? order.timestamps.paidAt.toDate() : new Date(order.timestamps.paidAt as any)
               const serviceTime = (paid.getTime() - received.getTime()) / (1000 * 60) // minutes
               totalServiceTime += serviceTime
             }
@@ -179,8 +179,8 @@ export default function AdminDashboard() {
   const recentOrders = orders
     .filter(order => order.status === 'paid')
     .sort((a, b) => {
-      const dateA = a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)
-      const dateB = b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)
+      const dateA = a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt as any)
+      const dateB = b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt as any)
       return dateB.getTime() - dateA.getTime()
     })
     .slice(0, 5)
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
 
     orders.forEach(order => {
       if (order.status === 'paid') {
-        const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt)
+        const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt as any)
         const daysDiff = Math.floor((new Date().getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24))
         
         if (daysDiff >= 0 && daysDiff < Math.min(days, 30)) {
@@ -367,10 +367,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tables Overview and Calls */}
-        <div className="grid gap-4 mt-4 lg:grid-cols-2">
-          <TablesOverview restaurantId={user.restaurantId} />
-          <TableCalls restaurantId={user.restaurantId} />
-        </div>
+        {user && (
+          <div className="grid gap-4 mt-4 lg:grid-cols-2">
+            <TablesOverview restaurantId={user.restaurantId} />
+            <TableCalls restaurantId={user.restaurantId} />
+          </div>
+        )}
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
           <Card className="col-span-4">

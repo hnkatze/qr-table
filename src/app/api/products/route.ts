@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
         
         const docRef = await createProduct(user.restaurantId, {
           ...data,
+          description: data.description || '',
           sortOrder: data.sortOrder ?? maxSortOrder + 1,
         })
         

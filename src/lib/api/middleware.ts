@@ -48,7 +48,7 @@ export async function withValidation<T>(
       return NextResponse.json(
         { 
           error: 'Datos inválidos',
-          details: error.errors.map(e => ({
+          details: error.issues.map(e => ({
             field: e.path.join('.'),
             message: e.message
           }))

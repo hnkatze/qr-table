@@ -24,7 +24,7 @@ export function RecentSales({ orders }: RecentSalesProps) {
   return (
     <div className="space-y-8">
       {orders.map((order) => {
-        const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt)
+        // const orderDate = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt as any)
         const initials = order.customerName 
           ? order.customerName.split(' ').map(n => n[0]).join('').toUpperCase()
           : '??'

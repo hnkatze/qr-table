@@ -13,9 +13,7 @@ export const userSchema = z.object({
     .min(6, 'La contraseña debe tener al menos 6 caracteres')
     .max(100, 'La contraseña no puede tener más de 100 caracteres')
     .optional(),
-  role: z.enum(['admin', 'cashier', 'waiter'], {
-    errorMap: () => ({ message: 'Rol inválido' })
-  }),
+  role: z.enum(['admin', 'cashier', 'waiter'] as const).describe('Rol inválido'),
   isActive: z.boolean().default(true),
   restaurantId: z.string().min(1, 'El ID del restaurante es requerido'),
 })
