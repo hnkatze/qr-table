@@ -1,5 +1,5 @@
 "use client"
-import { QrCode, MapPin, Clock, TrendingUp } from "lucide-react"
+import { QrCode, MapPin, Clock, TrendingUp, Mail, MessageCircle, Shield, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -12,11 +12,8 @@ export default function HomePage() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
               <QrCode className="h-8 w-8 text-orange-600" />
-              <span className="text-2xl font-bold text-gray-900">MenuQR</span>
+              <span className="text-2xl font-bold text-gray-900">QR Table</span>
             </div>
-            <Button variant="outline" asChild>
-              <a href="/dashboard-xR7m9">Panel Admin</a>
-            </Button>
           </div>
         </div>
       </header>
@@ -33,11 +30,16 @@ export default function HomePage() {
             solo escanear y ordenar.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-orange-600 hover:bg-orange-700">
-              Comenzar Gratis
+            <Button size="lg" className="bg-orange-600 hover:bg-orange-700" asChild>
+              <a href="/scan">
+                <Camera className="h-5 w-5 mr-2" />
+                Escanear QR
+              </a>
             </Button>
-            <Button size="lg" variant="outline">
-              Ver Demo
+            <Button size="lg" variant="outline" asChild>
+              <a href="/menu/restaurant_001?table=demo">
+                Ver Demo
+              </a>
             </Button>
           </div>
         </div>
@@ -103,68 +105,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Precios Accesibles para Todos</h2>
-            <p className="text-lg text-gray-600">Sin costos ocultos, sin comisiones por transacción</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle>Básico</CardTitle>
-                <CardDescription>Perfecto para empezar</CardDescription>
-                <div className="text-3xl font-bold">
-                  L. 500<span className="text-lg font-normal">/mes</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li>✓ Hasta 50 productos</li>
-                  <li>✓ 1 usuario cajero</li>
-                  <li>✓ QR ilimitados</li>
-                  <li>✓ Reportes básicos</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-orange-200 bg-orange-50">
-              <CardHeader>
-                <CardTitle>Profesional</CardTitle>
-                <CardDescription>Más popular</CardDescription>
-                <div className="text-3xl font-bold">
-                  L. 800<span className="text-lg font-normal">/mes</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li>✓ Productos ilimitados</li>
-                  <li>✓ 3 usuarios (cajero + meseros)</li>
-                  <li>✓ Analytics avanzados</li>
-                  <li>✓ Soporte prioritario</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Empresarial</CardTitle>
-                <CardDescription>Para múltiples sucursales</CardDescription>
-                <div className="text-3xl font-bold">
-                  L. 1,200<span className="text-lg font-normal">/mes</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li>✓ Todo lo anterior</li>
-                  <li>✓ Usuarios ilimitados</li>
-                  <li>✓ Múltiples sucursales</li>
-                  <li>✓ API personalizada</li>
-                </ul>
-              </CardContent>
-            </Card>
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-orange-600 to-red-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            ¿Quieres tener tu propio QR en la mesa?
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Comunícate con nosotros y hablamos sobre cómo podemos digitalizar tu restaurante
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              variant="secondary"
+              className="bg-white text-orange-600 hover:bg-gray-100"
+              asChild
+            >
+              <a href="mailto:henriquezhector1@hotmail.com">
+                <Mail className="h-5 w-5 mr-2" />
+                Enviar Email
+              </a>
+            </Button>
+            <Button 
+              size="lg" 
+              variant="secondary"
+              className="bg-green-500 text-white hover:bg-green-600 border-0"
+              asChild
+            >
+              <a 
+                href="https://wa.me/50497840276?text=Hola,%20me%20interesa%20QR%20Table%20para%20mi%20restaurante"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                WhatsApp: +504 9784-0276
+              </a>
+            </Button>
           </div>
         </div>
       </section>
@@ -176,16 +152,28 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <QrCode className="h-6 w-6" />
-                <span className="text-xl font-bold">MenuQR</span>
+                <span className="text-xl font-bold">QR Table</span>
               </div>
               <p className="text-gray-400">La solución más simple y económica para digitalizar tu restaurante.</p>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Producto</h3>
               <ul className="space-y-2 text-gray-400">
-                <li>Características</li>
-                <li>Precios</li>
-                <li>Demo</li>
+                <li>
+                  <a href="/scan" className="hover:text-white transition-colors">
+                    Escanear QR
+                  </a>
+                </li>
+                <li>
+                  <a href="/qr-simulator" className="hover:text-white transition-colors">
+                    Simulador QR
+                  </a>
+                </li>
+                <li>
+                  <a href="/menu/restaurant_001?table=demo" className="hover:text-white transition-colors">
+                    Ver Demo
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
@@ -205,8 +193,21 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 MenuQR. Todos los derechos reservados.</p>
+          <div className="border-t border-gray-800 mt-8 pt-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center">
+              <p className="text-gray-400">&copy; 2024 QR Table. Todos los derechos reservados.</p>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white mt-4 sm:mt-0"
+                asChild
+              >
+                <a href="/dashboard-xR7m9" className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Panel Admin
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </footer>
